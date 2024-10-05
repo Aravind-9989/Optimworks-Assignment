@@ -77,7 +77,7 @@ function Datafetching({ addToOrder }) {
 
   return (
     <div style={{border:"2px solid black"}}>
-     <center><h1>Order Your Faviourate Dishes</h1></center> 
+     <center><h1>Order Your favourite Dishes</h1></center> 
       <div style={styles.cardContainer}>
         {data.map((item, index) => (
           <div key={index} style={styles.card}>

@@ -47,15 +47,26 @@ function Datafetching({ addToOrder }) {
   };
 
   useEffect(() => {
-    fetchdata();
-  }, []);
+    const storedData = localStorage.getItem("menuData");
+    if (storedData) {
+      setData(JSON.parse(storedData));
+    } else {
+
+      fetchdata();
+    }
+  }, []); 
 
   const fetchdata = async () => {
     try {
       const response = await axios.get(
         "https://api.jsonbin.io/v3/b/66faa41facd3cb34a88ed968"
       );
-      setData(response.data.record);
+      const fetchedData = response.data.record;
+
+      
+      localStorage.setItem("menuData", JSON.stringify(fetchedData));
+
+      setData(fetchedData);
     } catch (error) {
       console.log(error, "data is not fetching");
     }
@@ -65,27 +76,28 @@ function Datafetching({ addToOrder }) {
     if (item.available_quantity > 0) {
       addToOrder(item); 
 
-      setData((prevData) =>
-        prevData.map((i) =>
-          i.id === item.id ? { ...i, available_quantity: i.available_quantity - 1 } : i
-        )
+      const updatedData = data.map((i) =>
+        i.id === item.id
+          ? { ...i, available_quantity: i.available_quantity - 1 }
+          : i
       );
+
+      setData(updatedData);
+      localStorage.setItem("menuData", JSON.stringify(updatedData));
     } else {
-      alert("out of stock!!!!!!!!!!!!!!!!!..........................");
+      alert("Out of stock!");
     }
   };
 
   return (
-    <div style={{border:"2px solid black"}}>
-     <center><h1>Order Your favourite Dishes</h1></center> 
+    <div style={{ border: "2px solid black" }}>
+      <center>
+        <h1>Order Your Favourite Dishes</h1>
+      </center>
       <div style={styles.cardContainer}>
         {data.map((item, index) => (
           <div key={index} style={styles.card}>
-            <img
-              src={item.image_url}
-              alt={item.name}
-              style={styles.cardImage}
-            />
+            <img src={item.image_url} alt={item.name} style={styles.cardImage} />
             <div style={styles.cardBody}>
               <h3>{item.name}</h3>
               <p>Category: {item.category}</p>
@@ -109,8 +121,10 @@ function Datafetching({ addToOrder }) {
         ))}
       </div>
       <Link to="/order">
-      <br />
-       <center><button style={styles.button}>Proceed to Order</button></center> 
+        <br />
+        <center>
+          <button style={styles.button}>Proceed to Order</button>
+        </center>
       </Link>
     </div>
   );
